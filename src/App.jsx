@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import confetti from 'canvas-confetti'
 
 function useTodos() {
   const [todos, setTodos] = useState(() =>
@@ -10,10 +11,23 @@ function useTodos() {
     localStorage.setItem('todos', JSON.stringify(next))
   }
 
+  const toggle = (id) => {
+    const todo = todos.find(t => t.id === id)
+    if (todo && !todo.done) {
+      confetti({
+        particleCount: 80,
+        spread: 55,
+        origin: { y: 0.6 },
+        colors: ['#000000', '#555555', '#aaaaaa', '#cccccc'],
+      })
+    }
+    save(todos.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  }
+
   return {
     todos,
     add: (text) => save([{ id: crypto.randomUUID(), text, done: false }, ...todos]),
-    toggle: (id) => save(todos.map(t => t.id === id ? { ...t, done: !t.done } : t)),
+    toggle,
     remove: (id) => save(todos.filter(t => t.id !== id)),
     clearDone: () => save(todos.filter(t => !t.done)),
   }
